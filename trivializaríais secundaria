@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz de Conocimientos Generales</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to right, #6a11cb, #2575fc);
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      padding: 20px;
+    }
+    .quiz-container {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 30px;
+      border-radius: 20px;
+      max-width: 600px;
+      text-align: center;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    }
+    .question {
+      font-size: 20px;
+      margin-bottom: 20px;
+    }
+    .option {
+      background: white;
+      color: #333;
+      padding: 10px 20px;
+      border-radius: 10px;
+      margin: 10px 0;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    .option.correct {
+      background-color: #4caf50 !important;
+      color: white;
+    }
+    .option.incorrect {
+      background-color: #f44336 !important;
+      color: white;
+    }
+    .option:hover:not(.correct):not(.incorrect) {
+      background-color: #f0f0f0;
+    }
+    #nextBtn {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #ffc107;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+    #nextBtn.enabled {
+      cursor: pointer;
+      opacity: 1;
+    }
+    #result {
+      font-size: 24px;
+      margin-top: 30px;
+    }
+  </style>
+</head>
+<body>
+  <div class="quiz-container animate__animated animate__fadeIn">
+    <div id="question-container">
+      <div class="question" id="question"></div>
+      <div id="options"></div>
+      <button id="nextBtn" onclick="nextQuestion()">Siguiente</button>
+    </div>
+    <div id="result"></div>
+  </div>
+
+  <script>
+    const quiz = [
+      { q: "¿Cuál es el río más largo del mundo?", o: ["Amazonas", "Nilo", "Yangtsé"], a: 0 },
+      { q: "¿Quién escribió 'Cien años de soledad'?", o: ["Pablo Neruda", "Gabriel García Márquez", "Mario Vargas Llosa"], a: 1 },
+      { q: "¿Cuál es el planeta más grande del sistema solar?", o: ["Saturno", "Júpiter", "Marte"], a: 1 },
+      { q: "¿Qué país tiene forma de bota?", o: ["España", "Italia", "Portugal"], a: 1 },
+      { q: "¿Quién pintó la Mona Lisa?", o: ["Miguel Ángel", "Leonardo da Vinci", "Van Gogh"], a: 1 },
+      { q: "¿Cuántos continentes hay?", o: ["5", "6", "7"], a: 2 },
+      { q: "¿Qué gas necesitan las plantas para la fotosíntesis?", o: ["Oxígeno", "Nitrógeno", "Dióxido de carbono"], a: 2 },
+      { q: "¿Cuál es la capital de Japón?", o: ["Pekín", "Seúl", "Tokio"], a: 2 },
+      { q: "¿Qué instrumento tiene cuerdas?", o: ["Violín", "Flauta", "Trombón"], a: 0 },
+      { q: "¿Cuántos lados tiene un hexágono?", o: ["5", "6", "8"], a: 1 },
+    ];
+
+    let current = 0;
+    let score = 0;
+    let answered = false;
+
+    const questionEl = document.getElementById('question');
+    const optionsEl = document.getElementById('options');
+    const nextBtn = document.getElementById('nextBtn');
+    const resultEl = document.getElementById('result');
+
+    function loadQuestion() {
+      const q = quiz[current];
+      questionEl.innerText = `Pregunta ${current + 1}: ${q.q}`;
+      optionsEl.innerHTML = '';
+      nextBtn.classList.remove('enabled');
+      nextBtn.disabled = true;
+      answered = false;
+
+      q.o.forEach((option, index) => {
+        const btn = document.createElement('div');
+        btn.classList.add('option');
+        btn.innerText = option;
+        btn.onclick = () => selectAnswer(btn, index);
+        optionsEl.appendChild(btn);
+      });
+    }
+
+    function selectAnswer(element, index) {
+      if (answered) return;
+      answered = true;
+
+      const correctIndex = quiz[current].a;
+      const options = optionsEl.children;
+      for (let i = 0; i < options.length; i++) {
+        if (i === correctIndex) {
+          options[i].classList.add('correct');
+        }
+        if (i === index && i !== correctIndex) {
+          options[i].classList.add('incorrect');
+        }
+      }
+      if (index === correctIndex) score++;
+
+      nextBtn.classList.add('enabled');
+      nextBtn.disabled = false;
+    }
+
+    function nextQuestion() {
+      current++;
+      if (current < quiz.length) {
+        loadQuestion();
+      } else {
+        showResult();
+      }
+    }
+
+    function showResult() {
+      document.getElementById('question-container').style.display = 'none';
+      let feedback = '';
+      if (score === 10) feedback = '¡Increíble! ¡10/10! ¡Eres un genio!';
+      else if (score >= 7) feedback = '¡Muy bien! Sabes bastante.';
+      else if (score >= 5) feedback = '¡Bien hecho! Pero puedes mejorar aún más.';
+      else feedback = '¡Ánimo! Sigue aprendiendo, lo harás mejor la próxima.';
+
+      resultEl.innerHTML = `<div class="animate__animated animate__fadeInUp">Puntaje final: ${score}/10<br>${feedback}</div>`;
+    }
+
+    loadQuestion();
+  </script>
+</body>
+</html>
